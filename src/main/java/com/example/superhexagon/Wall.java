@@ -5,6 +5,7 @@ import javafx.animation.RotateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.shape.Polygon;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 
 public class Wall {
@@ -36,27 +37,32 @@ public class Wall {
         return trapezoid;
     }
 
-    public void update(double speed) {
+    public void update(double speed, double rotationAngle) {
         distance -= 2 * speed;
         shape.getPoints().clear();
-        double angle = Math.toRadians(60 * section);
-        double nextAngle = Math.toRadians(60 * (section + 1));
+
+        double baseAngle = Math.toRadians(60 * section + rotationAngle);
+        double nextAngle = Math.toRadians(60 * (section + 1) + rotationAngle);
 
         shape.getPoints().addAll(
-                centerX + distance * Math.cos(angle), centerY + distance * Math.sin(angle),
+                centerX + distance * Math.cos(baseAngle), centerY + distance * Math.sin(baseAngle),
                 centerX + distance * Math.cos(nextAngle), centerY + distance * Math.sin(nextAngle),
                 centerX + (distance - 50) * Math.cos(nextAngle), centerY + (distance - 50) * Math.sin(nextAngle),
-                centerX + (distance - 50) * Math.cos(angle), centerY + (distance - 50) * Math.sin(angle)
+                centerX + (distance - 50) * Math.cos(baseAngle), centerY + (distance - 50) * Math.sin(baseAngle)
         );
     }
 
+
     public boolean isAtCenter() {
-        return distance <= 50;
+        return distance <= 100;
     }
 
     public boolean intersects(Player player) {
-        return shape.getBoundsInParent().intersects(player.getShape().getBoundsInParent());
+        Shape intersection = Shape.intersect(this.shape, player.getShape());
+        return intersection.getBoundsInLocal().getWidth() > 0 &&
+                intersection.getBoundsInLocal().getHeight() > 0;
     }
+
 
     public Polygon getShape() {
         return shape;
