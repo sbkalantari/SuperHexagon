@@ -8,7 +8,7 @@ public class Player {
     private double centerX, centerY;
     private double radius;
     private double angle;
-    private static final double ROTATION_SPEED = 180.0; // Degrees per second
+    public static final double ROTATION_SPEED = 180.0 * 0.016; // Degrees per second
 
     public Player(double centerX, double centerY, double radius) {
         this.centerX = centerX;
@@ -31,9 +31,9 @@ public class Player {
         return triangle;
     }
 
-    public void rotate(double direction) {
+    public void rotate(double angle) {
         // Direction is -1 for left, 1 for right; scaled by game speed
-        angle += direction * ROTATION_SPEED * 0.016; // 0.016 seconds per frame
+        this.angle += angle; // 0.016 seconds per frame
     }
 
     public void update(double speed) {

@@ -1,12 +1,8 @@
 package com.example.superhexagon;
 
-import javafx.animation.Animation;
-import javafx.animation.RotateTransition;
-import javafx.geometry.Point3D;
 import javafx.scene.shape.Polygon;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import javafx.util.Duration;
 
 public class Wall {
     private Polygon shape;

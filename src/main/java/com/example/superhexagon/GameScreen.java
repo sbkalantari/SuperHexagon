@@ -125,8 +125,9 @@ public class GameScreen {
         rotationAngle += 0.5 * gameSpeed;
 
         // Update player rotation based on key states
-        if (leftPressed && !rightPressed) player.rotate(-1 * gameSpeed);
-        if (rightPressed && !leftPressed) player.rotate(1 * gameSpeed);
+        if (leftPressed && !rightPressed) player.rotate(-1 * gameSpeed * Player.ROTATION_SPEED);
+        if (rightPressed && !leftPressed) player.rotate(1 * gameSpeed * Player.ROTATION_SPEED);
+        if (!rightPressed && !leftPressed) player.rotate(0.5 * gameSpeed);
         player.update(gameSpeed);
 
         // Spawn walls
@@ -143,9 +144,7 @@ public class GameScreen {
                 groupWalls.getChildren().remove(wall.getShape());
                 return true;
             }
-            if (wall.intersects(player)){
-                endGame();
-            }
+            if (wall.intersects(player)) endGame();
             return false;
         });
         updateCore();
@@ -153,18 +152,31 @@ public class GameScreen {
         // Increase difficulty
         gameSpeed = 1.0 + elapsedTime / 60.0;
 
-        // Update visuals
-//        pane.getChildren().removeIf(node -> node instanceof Polygon && node != core && node != player.getShape());
-//        walls.forEach(wall -> pane.getChildren().add(wall.getShape()));
-//        walls.forEach(wall -> groupWalls.getChildren().add(wall.getShape()));
-
     }
 
     private void endGame() {
         gameLoop.stop();
         if (mediaPlayer != null) mediaPlayer.stop();
         controller.saveGameData(new GameData(playerName, ZonedDateTime.now(), elapsedTime));
-        controller.showMainMenu();
+
+        javafx.scene.effect.BoxBlur blur = new javafx.scene.effect.BoxBlur(5, 5, 3);
+        pane.getChildren().forEach(child -> child.setEffect(blur));
+
+        Text gameOverText = new Text("GAME OVER");
+        gameOverText.setFill(Color.RED);
+        gameOverText.setStyle("-fx-font-size: 48px; -fx-font-weight: bold;");
+        gameOverText.setX(250);
+        gameOverText.setY(100);
+
+        Text scoreText = new Text("Your time: " + String.format("%.1f", elapsedTime) + "s");
+        scoreText.setFill(Color.WHITE);
+        scoreText.setStyle("-fx-font-size: 24px;");
+        scoreText.setX(300);
+        scoreText.setY(150);
+
+
+        pane.getChildren().addAll(gameOverText, scoreText);
+//        controller.showMainMenu();
     }
 
     private void togglePause() {
