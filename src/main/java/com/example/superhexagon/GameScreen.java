@@ -39,6 +39,9 @@ public class GameScreen {
     private boolean rightPressed = false;
     private double rotationAngle = 0;
     private double coreRadius = 50;
+    private int lastPatternTick = 0;
+    private final int patternInterval = 60;
+    private int trapType1Start = 0;
 
     public GameScreen(Stage stage, GameController controller, String playerName) {
         this.stage = stage;
@@ -100,29 +103,13 @@ public class GameScreen {
         gameLoop.setCycleCount(Timeline.INDEFINITE);
         gameLoop.play();
 
-//        RotateTransition rt = new RotateTransition(Duration.seconds(10), core);
-//        rt.setByAngle(360);
-//        rt.setCycleCount(Animation.INDEFINITE);
-//        rt.play();
-
-//        Rotate rotate = new Rotate(0, 400, 300);
-//        this.groupWalls.getTransforms().add(rotate);
-//        core.getTransforms().add(rotate);
-//
-//        Timeline timeline = new Timeline(
-//                new KeyFrame(Duration.ZERO, new KeyValue(rotate.angleProperty(), 0)),
-//                new KeyFrame(Duration.seconds(10), new KeyValue(rotate.angleProperty(), 360))
-//        );
-//        timeline.setCycleCount(Animation.INDEFINITE);
-//        timeline.play();
-
         pane.requestFocus();
     }
 
     private void update() {
         elapsedTime += 0.016 * gameSpeed;
         timeText.setText("Time: " + String.format("%.1f", elapsedTime));
-        rotationAngle += 0.5 * gameSpeed;
+        rotationAngle = (rotationAngle + 0.5 * gameSpeed) % 360;
 
         // Update player rotation based on key states
         if (leftPressed && !rightPressed) player.rotate(-1 * gameSpeed * Player.ROTATION_SPEED);
@@ -130,11 +117,21 @@ public class GameScreen {
         if (!rightPressed && !leftPressed) player.rotate(0.5 * gameSpeed);
         player.update(gameSpeed);
 
-        // Spawn walls
-        if (random.nextDouble() < 0.02 * gameSpeed) {
-            Wall wall = new Wall(400, 300, random.nextInt(6));
-            walls.add(wall);
-            groupWalls.getChildren().add(wall.getShape());
+        lastPatternTick++;
+        if (lastPatternTick >= patternInterval) {
+            lastPatternTick = 0;
+            WallPatternMode mode = WallPatternMode.values()[random.nextInt(WallPatternMode.values().length)];
+            switch (mode) {
+                case TYPE1:
+                    spawnType1();
+                    break;
+                case TYPE2:
+                    spawnType2();
+                    break;
+                case TYPE3:
+                    spawnType3();
+                    break;
+            }
         }
 
         // Update walls
@@ -228,4 +225,36 @@ public class GameScreen {
             core.getPoints().addAll(x, y);
         }
     }
+
+    private void spawnType1() {
+        for (int i = trapType1Start; i < 6; i += 2) {
+            Wall wall = new Wall(400, 300, i);
+            walls.add(wall);
+            groupWalls.getChildren().add(wall.getShape());
+        }
+        trapType1Start = (trapType1Start + 1) %2;
+    }
+
+    private void spawnType2() {
+        int start = random.nextInt(6);
+        for (int i = 0; i < 3; i++) {
+            int section = (start + i) % 6;
+            Wall wall = new Wall(400, 300, section);
+            walls.add(wall);
+            groupWalls.getChildren().add(wall.getShape());
+        }
+    }
+
+    private void spawnType3() {
+        int totalWalls = 4; // tweakable
+        List<Integer> sections = new ArrayList<>();
+        for (int i = 0; i < 6; i++) sections.add(i);
+        java.util.Collections.shuffle(sections);
+        for (int i = 0; i < totalWalls; i++) {
+            Wall wall = new Wall(400, 300, sections.get(i));
+            walls.add(wall);
+            groupWalls.getChildren().add(wall.getShape());
+        }
+    }
+
 }

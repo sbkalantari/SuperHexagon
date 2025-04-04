@@ -8,49 +8,43 @@ public class Wall {
     private Polygon shape;
     private double centerX, centerY;
     private double distance;
+    private static final double WIDTH = 20;
+    private static final int TOTAL_SECTIONS = 6;
     private int section;
 
     public Wall(double centerX, double centerY, int section) {
         this.centerX = centerX;
         this.centerY = centerY;
-        this.section = section;
+        this.section = section % TOTAL_SECTIONS;
         this.distance = 300;
-        this.shape = createTrapezoid();
-        shape.setFill(Color.RED);
-    }
-
-    private Polygon createTrapezoid() {
-        Polygon trapezoid = new Polygon();
-        double angle = Math.toRadians(60 * section);
-        double nextAngle = Math.toRadians(60 * (section + 1));
-
-        trapezoid.getPoints().addAll(
-                centerX + distance * Math.cos(angle), centerY + distance * Math.sin(angle),
-                centerX + distance * Math.cos(nextAngle), centerY + distance * Math.sin(nextAngle),
-                centerX + (distance - 50) * Math.cos(nextAngle), centerY + (distance - 50) * Math.sin(nextAngle),
-                centerX + (distance - 50) * Math.cos(angle), centerY + (distance - 50) * Math.sin(angle)
-        );
-        return trapezoid;
+        this.shape = new Polygon();
+        this.shape.setFill(Color.RED);
+        update(0, 0); // initialize shape
     }
 
     public void update(double speed, double rotationAngle) {
         distance -= 2 * speed;
         shape.getPoints().clear();
 
-        double baseAngle = Math.toRadians(60 * section + rotationAngle);
-        double nextAngle = Math.toRadians(60 * (section + 1) + rotationAngle);
+        // Always normalize rotation to avoid float precision errors
+        rotationAngle = rotationAngle % 360;
+
+        double angle1 = Math.toRadians(60 * section + rotationAngle);
+        double angle2 = Math.toRadians(60 * ((section + 1) % TOTAL_SECTIONS) + rotationAngle);
+
+        double outer = distance;
+        double inner = distance - WIDTH;
 
         shape.getPoints().addAll(
-                centerX + distance * Math.cos(baseAngle), centerY + distance * Math.sin(baseAngle),
-                centerX + distance * Math.cos(nextAngle), centerY + distance * Math.sin(nextAngle),
-                centerX + (distance - 50) * Math.cos(nextAngle), centerY + (distance - 50) * Math.sin(nextAngle),
-                centerX + (distance - 50) * Math.cos(baseAngle), centerY + (distance - 50) * Math.sin(baseAngle)
+                centerX + outer * Math.cos(angle1), centerY + outer * Math.sin(angle1),
+                centerX + outer * Math.cos(angle2), centerY + outer * Math.sin(angle2),
+                centerX + inner * Math.cos(angle2), centerY + inner * Math.sin(angle2),
+                centerX + inner * Math.cos(angle1), centerY + inner * Math.sin(angle1)
         );
     }
 
-
     public boolean isAtCenter() {
-        return distance <= 100;
+        return distance <= WIDTH + 50;
     }
 
     public boolean intersects(Player player) {
@@ -58,7 +52,6 @@ public class Wall {
         return intersection.getBoundsInLocal().getWidth() > 0 &&
                 intersection.getBoundsInLocal().getHeight() > 0;
     }
-
 
     public Polygon getShape() {
         return shape;
