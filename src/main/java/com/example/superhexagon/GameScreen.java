@@ -174,8 +174,20 @@ public class GameScreen {
         scoreText.setX(300);
         scoreText.setY(150);
 
+        javafx.scene.control.Button retryButton = new javafx.scene.control.Button("Retry");
+        retryButton.setLayoutX(300);
+        retryButton.setLayoutY(200);
+        retryButton.setOnAction(e -> {
+            controller.startNewGame(playerName);
+        });
 
-        pane.getChildren().addAll(gameOverText, scoreText);
+        javafx.scene.control.Button menuButton = new javafx.scene.control.Button("Back to Menu");
+        menuButton.setLayoutX(370);
+        menuButton.setLayoutY(200);
+        menuButton.setOnAction(e -> controller.showMainMenu());
+
+
+        pane.getChildren().addAll(gameOverText, scoreText, retryButton, menuButton);
 //        controller.showMainMenu();
     }
 

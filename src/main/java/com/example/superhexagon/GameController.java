@@ -27,7 +27,7 @@ public class GameController {
     }
 
     public void showMainMenu() {
-        stage.setScene(new Scene(new MainMenu(stage).getPane(), 800, 600));
+        stage.setScene(new Scene(new MainMenu(stage, this).getPane(), 800, 600));
     }
 
     public void startNewGame(String playerName) {
@@ -42,7 +42,7 @@ public class GameController {
             try (Writer writer = new FileWriter(HISTORY_FILE)) {
                 gson.toJson(gameHistory, writer);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.out);
             }
         }
     }
@@ -69,6 +69,7 @@ public class GameController {
 
     public void setMusicEnabled(boolean enabled) {
         this.musicEnabled = enabled;
+//        this.musicEnabled = false;
     }
 
     public void setSaveHistory(boolean save) {

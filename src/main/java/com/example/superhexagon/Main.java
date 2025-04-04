@@ -6,7 +6,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
-        MainMenu mainMenu = new MainMenu(primaryStage);
+        GameController controller = new GameController(primaryStage);
+        MainMenu mainMenu = new MainMenu(primaryStage, controller);
         Scene scene = new Scene(mainMenu.getPane(), 800, 600);
         primaryStage.setTitle("Super Hexagon Clone");
         primaryStage.setScene(scene);

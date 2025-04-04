@@ -7,13 +7,13 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class MainMenu {
-    private Pane pane;
-    private Stage stage;
-    private GameController controller;
+    private final Pane pane;
+    private final Stage stage;
+    private final GameController controller;
 
-    public MainMenu(Stage stage) {
+    public MainMenu(Stage stage, GameController controller) {
         this.stage = stage;
-        this.controller = new GameController(stage);
+        this.controller = controller;
         this.pane = new Pane();
         initializeMenu();
     }
