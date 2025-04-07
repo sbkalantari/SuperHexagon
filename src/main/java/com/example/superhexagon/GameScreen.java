@@ -71,7 +71,7 @@ public class GameScreen {
 
         // UI
         timeText = new Text(10, 20, "Time: 0.0");
-        recordText = new Text(10, 40, "Record: " + String.format("%.1f", controller.getBestTime()));
+        recordText = new Text(10, 40, "Record: " + String.format("%.1f", controller.getBestGameData().duration));
         pane.getChildren().addAll(timeText, recordText);
 
         // Background

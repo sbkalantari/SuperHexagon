@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import com.google.gson.Gson;
 import java.io.*;
@@ -60,11 +61,10 @@ public class GameController {
         return gameHistory;
     }
 
-    public double getBestTime() {
+    public GameData getBestGameData() {
         return gameHistory.stream()
-                .mapToDouble(GameData::getDuration)
-                .max()
-                .orElse(0.0);
+                .max(Comparator.comparingDouble(GameData::getDuration))
+                .orElse(new GameData("Unknown", ZonedDateTime.now(), 0));
     }
 
     public void setMusicEnabled(boolean enabled) {
