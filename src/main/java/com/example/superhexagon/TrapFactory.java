@@ -42,8 +42,8 @@ public class TrapFactory {
     }
 
     private void spawnType2() {
-        int start = random.nextInt(2);
-        for (int i = trapType2Start; i < 3; i++) {
+        int start = random.nextInt(2) + trapType2Start;
+        for (int i = 0; i < 4; i++) {
             int section = (start + i) % 6;
             Wall wall = new Wall(400, 300, section);
             walls.add(wall);
