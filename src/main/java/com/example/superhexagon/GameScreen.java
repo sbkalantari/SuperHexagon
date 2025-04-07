@@ -18,14 +18,13 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 public class GameScreen {
-    private Pane pane;
+    private final Pane pane;
     private Stage stage;
-    private GameController controller;
+    private final GameController controller;
     private Player player;
-    private List<Wall> walls;
-    private Group groupWalls;
+    private final List<Wall> walls;
+    private final Group groupWalls;
     private Polygon core;
-    private double rotationSpeed = 1.0;
     private double gameSpeed = 1.0;
     private Timeline gameLoop;
     private double elapsedTime = 0;
@@ -40,9 +39,9 @@ public class GameScreen {
     private int lastPatternTick = 0;
     private final int patternInterval = 60;
     private final TrapFactory trapFactory;
-    private double orbitCirculeSpeed = 0.5;
+    private double rotationSpeed = 0.5;
     private int swapTime = 0;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public GameScreen(Stage stage, GameController controller, String playerName) {
         this.stage = stage;
@@ -111,20 +110,20 @@ public class GameScreen {
     private void update() {
         elapsedTime += 0.016 * gameSpeed;
         timeText.setText("Time: " + String.format("%.1f", elapsedTime));
-        rotationAngle = (rotationAngle + orbitCirculeSpeed * gameSpeed) % 360;
+        rotationAngle = (rotationAngle + rotationSpeed * gameSpeed) % 360;
 
         swapTime ++;
         if (swapTime % 300 == 0){
             if (random.nextInt(0, 1) == 0){
                 swapTime = 0;
-                orbitCirculeSpeed = -orbitCirculeSpeed;
+                rotationSpeed = -rotationSpeed;
             }
         }
 
         // Update player rotation based on key states
         if (leftPressed && !rightPressed) player.rotate(-1.2 * gameSpeed * Player.ROTATION_SPEED);
         if (rightPressed && !leftPressed) player.rotate(1.2 * gameSpeed * Player.ROTATION_SPEED);
-        if (!rightPressed && !leftPressed) player.rotate(orbitCirculeSpeed * gameSpeed);
+        if (!rightPressed && !leftPressed) player.rotate(rotationSpeed * gameSpeed);
         player.update(gameSpeed);
 
         lastPatternTick++;
@@ -184,7 +183,6 @@ public class GameScreen {
 
 
         pane.getChildren().addAll(gameOverText, scoreText, retryButton, menuButton);
-//        controller.showMainMenu();
     }
 
     private void togglePause() {
