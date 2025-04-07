@@ -33,7 +33,6 @@ public class GameScreen {
     private Text timeText;
     private Text recordText;
     private String playerName;
-    private Random random = new Random();
     private MediaPlayer mediaPlayer;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -41,7 +40,8 @@ public class GameScreen {
     private double coreRadius = 50;
     private int lastPatternTick = 0;
     private final int patternInterval = 60;
-    private int trapType1Start = 0;
+    private final TrapFactory trapFactory;
+
 
     public GameScreen(Stage stage, GameController controller, String playerName) {
         this.stage = stage;
@@ -56,6 +56,7 @@ public class GameScreen {
                 pane.requestFocus();
             }
         });
+        this.trapFactory = new TrapFactory(this.groupWalls, this.walls);
     }
     private void initializeGame() {
         // Core hexagon
@@ -120,18 +121,7 @@ public class GameScreen {
         lastPatternTick++;
         if (lastPatternTick >= patternInterval) {
             lastPatternTick = 0;
-            WallPatternMode mode = WallPatternMode.values()[random.nextInt(WallPatternMode.values().length)];
-            switch (mode) {
-                case TYPE1:
-                    spawnType1();
-                    break;
-                case TYPE2:
-                    spawnType2();
-                    break;
-                case TYPE3:
-                    spawnType3();
-                    break;
-            }
+            trapFactory.produce();
         }
 
         // Update walls
@@ -223,37 +213,6 @@ public class GameScreen {
             double x = 400 + coreRadius  * Math.cos(baseAngle);
             double y = 300 + coreRadius  * Math.sin(baseAngle);
             core.getPoints().addAll(x, y);
-        }
-    }
-
-    private void spawnType1() {
-        for (int i = trapType1Start; i < 6; i += 2) {
-            Wall wall = new Wall(400, 300, i);
-            walls.add(wall);
-            groupWalls.getChildren().add(wall.getShape());
-        }
-        trapType1Start = (trapType1Start + 1) %2;
-    }
-
-    private void spawnType2() {
-        int start = random.nextInt(6);
-        for (int i = 0; i < 3; i++) {
-            int section = (start + i) % 6;
-            Wall wall = new Wall(400, 300, section);
-            walls.add(wall);
-            groupWalls.getChildren().add(wall.getShape());
-        }
-    }
-
-    private void spawnType3() {
-        int totalWalls = 4; // tweakable
-        List<Integer> sections = new ArrayList<>();
-        for (int i = 0; i < 6; i++) sections.add(i);
-        java.util.Collections.shuffle(sections);
-        for (int i = 0; i < totalWalls; i++) {
-            Wall wall = new Wall(400, 300, sections.get(i));
-            walls.add(wall);
-            groupWalls.getChildren().add(wall.getShape());
         }
     }
 
