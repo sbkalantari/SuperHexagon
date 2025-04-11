@@ -1,9 +1,12 @@
 package com.example.superhexagon;
 
 import javafx.animation.*;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -58,7 +61,12 @@ public class GameScreen {
         });
         this.trapFactory = new TrapFactory(this.groupWalls, this.walls);
     }
+
     private void initializeGame() {
+        LinearGradient gameBackground = new LinearGradient(0, 0, 1, 1, true, null,
+                new Stop(0, Color.MIDNIGHTBLUE), new Stop(1, Color.DARKSLATEBLUE));
+        pane.setBackground(new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(gameBackground, null, null)));
+
         // Core hexagon
         core = createHexagon(400, 300, 50);
         core.setFill(Color.BLACK);
@@ -69,13 +77,20 @@ public class GameScreen {
         player = new Player(400, 300, 70);
         pane.getChildren().add(player.getShape());
 
-        // UI
-        timeText = new Text(10, 20, "Time: 0.0");
-        recordText = new Text(10, 40, "Record: " + String.format("%.1f", controller.getBestGameData().duration));
-        pane.getChildren().addAll(timeText, recordText);
+        timeText = new Text("Time: 0.0");
+        recordText = new Text("Record: " + String.format("%.1f", controller.getBestGameData().duration));
 
-        // Background
-        pane.setStyle("-fx-background-color: #333333;");
+        timeText.setFill(Color.WHITE);
+        timeText.setFont(javafx.scene.text.Font.font("Verdana", 20));
+        timeText.setLayoutX(400 - timeText.getBoundsInLocal().getWidth() / 2);
+        timeText.setLayoutY(25);
+
+        recordText.setFill(Color.WHITE);
+        recordText.setFont(javafx.scene.text.Font.font("Verdana", 20));
+        recordText.setLayoutX(400 - recordText.getBoundsInLocal().getWidth() / 2);
+        recordText.setLayoutY(50);
+
+        pane.getChildren().addAll(timeText, recordText);
 
         // Input handling
         pane.setOnKeyPressed(event -> {
@@ -112,15 +127,14 @@ public class GameScreen {
         timeText.setText("Time: " + String.format("%.1f", elapsedTime));
         rotationAngle = (rotationAngle + rotationSpeed * gameSpeed) % 360;
 
-        swapTime ++;
-        if (swapTime % 300 == 0){
-            if (random.nextInt(0, 1) == 0){
+        swapTime++;
+        if (swapTime % 300 == 0) {
+            if (random.nextInt(0, 1) == 0) {
                 swapTime = 0;
                 rotationSpeed = -rotationSpeed;
             }
         }
 
-        // Update player rotation based on key states
         if (leftPressed && !rightPressed) player.rotate(-1.2 * gameSpeed * Player.ROTATION_SPEED);
         if (rightPressed && !leftPressed) player.rotate(1.2 * gameSpeed * Player.ROTATION_SPEED);
         if (!rightPressed && !leftPressed) player.rotate(rotationSpeed * gameSpeed);
@@ -132,10 +146,9 @@ public class GameScreen {
             trapFactory.produce();
         }
 
-        // Update walls
         walls.forEach(wall -> wall.update(gameSpeed, rotationAngle));
         walls.removeIf(wall -> {
-            if (wall.isAtCenter()){
+            if (wall.isAtCenter()) {
                 groupWalls.getChildren().remove(wall.getShape());
                 return true;
             }
@@ -144,9 +157,7 @@ public class GameScreen {
         });
         updateCore();
 
-        // Increase difficulty
         gameSpeed = 1.0 + elapsedTime / 60.0;
-
     }
 
     private void endGame() {
@@ -170,17 +181,19 @@ public class GameScreen {
         scoreText.setY(150);
 
         javafx.scene.control.Button retryButton = new javafx.scene.control.Button("Retry");
-        retryButton.setLayoutX(300);
-        retryButton.setLayoutY(200);
+        retryButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 12px; -fx-background-radius: 10px; -fx-min-width: 200px;");
         retryButton.setOnAction(e -> {
             controller.startNewGame(playerName);
         });
 
         javafx.scene.control.Button menuButton = new javafx.scene.control.Button("Back to Menu");
-        menuButton.setLayoutX(370);
-        menuButton.setLayoutY(200);
+        menuButton.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 12px; -fx-background-radius: 10px; -fx-min-width: 200px;");
         menuButton.setOnAction(e -> controller.showMainMenu());
 
+        retryButton.setLayoutX(300);
+        retryButton.setLayoutY(200);
+        menuButton.setLayoutX(300);
+        menuButton.setLayoutY(280);
 
         pane.getChildren().addAll(gameOverText, scoreText, retryButton, menuButton);
     }
@@ -217,10 +230,9 @@ public class GameScreen {
 
         for (int i = 0; i < 6; i++) {
             double baseAngle = Math.toRadians(60 * i) + angleRad;
-            double x = 400 + coreRadius  * Math.cos(baseAngle);
-            double y = 300 + coreRadius  * Math.sin(baseAngle);
+            double x = 400 + coreRadius * Math.cos(baseAngle);
+            double y = 300 + coreRadius * Math.sin(baseAngle);
             core.getPoints().addAll(x, y);
         }
     }
-
 }
